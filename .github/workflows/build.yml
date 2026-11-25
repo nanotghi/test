@@ -16,8 +16,16 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.5
-      - run: gradle build
+      - name: Build
+        run: |
+          FILE=$(find . -name settings.gradle -not -path './.git/*' | head -n 1)
+          if [ -z "$FILE" ]; then
+            echo "settings.gradle 을 찾지 못했습니다. 저장소에 프로젝트 파일이 올라갔는지 확인하세요."
+            exit 1
+          fi
+          cd "$(dirname "$FILE")"
+          gradle build
       - uses: actions/upload-artifact@v4
         with:
           name: JumpMapDonation-jar
-          path: build/libs/*.jar
+          path: "**/build/libs/*.jar"
